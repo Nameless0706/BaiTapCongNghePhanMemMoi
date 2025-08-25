@@ -1,41 +1,51 @@
-import { Model, DataTypes, type Optional, Sequelize } from "sequelize";
+import { Model, type Optional, DataTypes } from 'sequelize';
+import type { Sequelize } from 'sequelize';
 
-interface UserAttributes {
+// Define the attributes of your model
+export interface UserAttributes {
   id: number;
   email: string;
-  password: string;
+  password?: string;
   firstName: string;
   lastName: string;
-  address: string;
-  phoneNumber: string;
-  gender: boolean;
+  address?: string;
+  phoneNumber?: string;
+  gender?: string;
   image?: string;
   roleId: string;
+  positionId?: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
+// Define the optional attributes for model creation
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
-export class User
-  extends Model<UserAttributes, UserCreationAttributes>
-  implements UserAttributes
-{
+// Define the User model class
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  // Define attributes for the instance
   public id!: number;
   public email!: string;
-  public password!: string;
+  public password?: string;
   public firstName!: string;
   public lastName!: string;
-  public address!: string;
-  public phoneNumber!: string;
-  public gender!: boolean;
+  public address?: string;
+  public phoneNumber?: string;
+  public gender?: string;
   public image?: string;
   public roleId!: string;
+  public positionId?: string;
 
+  // Timestamps
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  // Association method
   static associate(models: any) {
-    // define associations here
+    // Define association here
   }
 }
 
-export default (sequelize: Sequelize) => {
+// Initialize the model
+const UserInit = (sequelize: Sequelize): typeof User => {
   User.init(
     {
       id: {
@@ -43,20 +53,56 @@ export default (sequelize: Sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      address: DataTypes.STRING,
-      phoneNumber: DataTypes.STRING,
-      gender: DataTypes.BOOLEAN,
-      image: DataTypes.STRING,
-      roleId: DataTypes.STRING,
+      email: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      firstName: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+      },
+      address: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      phoneNumber: {
+        type: DataTypes.STRING(16),
+        allowNull: true,
+      },
+      gender: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      image: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      roleId: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+      positionId: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
     },
     {
       sequelize,
-      modelName: "User",
+      tableName: 'Users',
+      modelName: 'User',
+      timestamps: true,
     }
   );
+
   return User;
 };
+
+export default UserInit;

@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import db from "../models/index.js"; 
+import db from "../models/index.js";
 import CRUDService from "../services/CRUDService.js";
 
 const getHomePage = async (req: Request, res: Response): Promise<void> => {
@@ -44,7 +44,7 @@ const postCRUD = async (req: Request, res: Response): Promise<void> => {
 };
 
 const getEditCRUD = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.query.id as string;
+  const userId = Number(req.query.id);
   if (userId) {
     const userData = await CRUDService.getUserInfoById(userId);
     if (userData) {
@@ -61,14 +61,14 @@ const getEditCRUD = async (req: Request, res: Response): Promise<void> => {
 
 const putCRUD = async (req: Request, res: Response): Promise<void> => {
   const data = req.body;
-  const data1 = await CRUDService.updateUser(data);
+  const data1 = await CRUDService.updateUserData(data);
   res.render("users/findAllUser.ejs", {
     datalist: data1,
   });
 };
 
 const deleteCRUD = async (req: Request, res: Response): Promise<void> => {
-  const id = req.query.id as string;
+  const id = Number(req.query.id);
   if (id) {
     await CRUDService.deleteUserById(id);
     res.send("Delete the user succeed!");

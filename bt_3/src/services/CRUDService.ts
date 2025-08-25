@@ -1,12 +1,15 @@
+// src/services/userService.ts
+
 import bcrypt from "bcryptjs";
-import db from "../models/index.js";
-import { User } from "../models/user.js"; 
+import db from "../models/index.js"; // Import the initialized db object from index.ts
 import type { Optional } from "sequelize";
+import type { UserAttributes } from "../models/user.js"; // Import the UserAttributes interface
 
 const salt = bcrypt.genSaltSync(10);
 
 // Định nghĩa type cho dữ liệu user tạo mới
-interface UserInput extends Optional<User, "id"> {}
+// Use the UserAttributes interface you defined in your model file
+interface UserInput extends Optional<UserAttributes, "id"> {}
 
 const hashUserPassword = async (password: string): Promise<string> => {
   return bcrypt.hashSync(password, salt);
@@ -14,7 +17,7 @@ const hashUserPassword = async (password: string): Promise<string> => {
 
 const createNewUser = async (data: UserInput): Promise<string> => {
   try {
-    const hashPasswordFromBcrypt = await hashUserPassword(data.password);
+    const hashPasswordFromBcrypt = await hashUserPassword(data.password!); // 'password' might be optional in UserAttributes
     await db.User.create({
       email: data.email,
       password: hashPasswordFromBcrypt,
@@ -32,7 +35,8 @@ const createNewUser = async (data: UserInput): Promise<string> => {
   }
 };
 
-const getFindAllUser = async (): Promise<User[]> => {
+const getFindAllUser = async (): Promise<UserAttributes[]> => {
+  // Return type should be UserAttributes array
   try {
     const users = await db.User.findAll({ raw: true });
     return users;
@@ -42,7 +46,10 @@ const getFindAllUser = async (): Promise<User[]> => {
   }
 };
 
-const getUserInfoById = async (userId: number): Promise<User | null> => {
+const getUserInfoById = async (
+  userId: number
+): Promise<UserAttributes | null> => {
+  // Return type should be UserAttributes
   try {
     const user = await db.User.findOne({
       where: { id: userId },
@@ -55,7 +62,10 @@ const getUserInfoById = async (userId: number): Promise<User | null> => {
   }
 };
 
-const updateUserData = async (data: UserInput): Promise<User[] | void> => {
+const updateUserData = async (
+  data: UserInput
+): Promise<UserAttributes[] | void> => {
+  // Return type should be UserAttributes array
   try {
     const user = await db.User.findOne({ where: { id: data.id } });
     if (user) {
