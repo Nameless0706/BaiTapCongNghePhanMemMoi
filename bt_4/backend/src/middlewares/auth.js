@@ -10,7 +10,9 @@ const auth = (req, res, next) => {
     }
 
     else{
-
+        
+        console.log('>>> Check auth: ', req.originalUrl);
+        console.log('>>> Headers: ', req.headers);
 
         if(req?.headers?.authorization.split(' ')?.[1]){
             const token = req.headers.authorization.split(' ')[1];

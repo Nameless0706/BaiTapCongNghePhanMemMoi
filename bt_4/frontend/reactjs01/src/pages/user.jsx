@@ -1,17 +1,20 @@
-import { notification, Table } from 'antd';
-import { useEffect, useState } from 'react';
-import { getUserApi } from '../util/api';
+import { notification, Table } from "antd";
+import { useEffect, useState } from "react";
+import { getUserApi } from "../util/api";
 
 const UserPage = () => {
   const [dataSource, setDataSource] = useState([]);
   useEffect(() => {
     const fetchUser = async () => {
       const res = await getUserApi();
-      if (res.message) {
+      console.log(">>> Res get user: ", res);
+      if (res && res.length > 0) {
         setDataSource(res);
+        console.log("Fetch user: ", res);
       } else {
+        console.log("Fetch user failed: ", res);
         notification.error({
-          message: 'unauthorized',
+          message: "unauthorized",
           description: res.message,
         });
       }
@@ -21,20 +24,20 @@ const UserPage = () => {
 
   const columns = [
     {
-      title: 'id',
-      dataIndex: '_id',
+      title: "id",
+      dataIndex: "_id",
     },
     {
-      title: 'email',
-      dataIndex: 'email',
+      title: "email",
+      dataIndex: "email",
     },
     {
-      title: 'name',
-      dataIndex: 'name',
+      title: "name",
+      dataIndex: "name",
     },
     {
-      title: 'role',
-      dataIndex: 'role',
+      title: "role",
+      dataIndex: "role",
     },
   ];
 

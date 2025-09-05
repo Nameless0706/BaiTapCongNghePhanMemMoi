@@ -14,8 +14,10 @@ const LoginPage = () => {
 
     const res = await loginApi(email, password);
 
-    if (res && res.EC === 0) {
-      localStorage.setItem("access_token", res.access_token);
+    
+
+    if (res && Number(res.EC) === 0) {
+      localStorage.setItem("access_token", res.accessToken);
       notification.success({
         message: "LOGIN USER",
         description: "Success",
@@ -27,8 +29,10 @@ const LoginPage = () => {
           name: res.user?.name ?? "",
         },
       });
+      console.log("Navigating to / now...");
       navigate("/");
     } else {
+      console.log("Login error: ", res);
       notification.error({
         message: "LOGIN USER",
         description: res.EM ?? "error",
