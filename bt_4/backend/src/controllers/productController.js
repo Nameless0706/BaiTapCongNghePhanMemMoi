@@ -2,13 +2,14 @@ const {
   createProductService,
   getProductsByCategoryService,
   getAllProductsService,
+  searchProductService,
 } = require("../services/productService");
 
 const Category = require("../models/category");
 
 const createProduct = async (req, res) => {
   try {
-    const { name, price, description, categoryName } = req.body;
+    const { name, price, description, view, categoryName } = req.body;
 
     // Find category by name
     const category = await Category.findOne({ name: categoryName });
@@ -25,12 +26,13 @@ const createProduct = async (req, res) => {
       name,
       price,
       description,
+      view,
       category._id
     );
 
     if (data && data.DT) {
       console.log("Created product:", data.DT);
-      return res.status(201).json(data); 
+      return res.status(201).json(data);
     } else {
       console.error("Error creating product:", data.EM);
       return res.status(500).json(data);
@@ -46,19 +48,18 @@ const createProduct = async (req, res) => {
 };
 
 const getProductsByCategory = async (req, res) => {
-    try{
-        const data = await getProductsByCategoryService(req, res);
-        return res.status(200).json(data);
-    }
-    catch(error){
-        console.error("Error fetching products by category:", error);
-        return res.status(500).json({
-            EC: -1,
-            EM: "Internal server error",
-            DT: null
-        });
-    }
-}
+  try {
+    const data = await getProductsByCategoryService(req, res);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching products by category:", error);
+    return res.status(500).json({
+      EC: -1,
+      EM: "Internal server error",
+      DT: null,
+    });
+  }
+};
 
 const getAllProducts = async (req, res) => {
   try {
@@ -74,8 +75,15 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+// Search products
+const searchProductController = async (req, res) => {
+  const result = await searchProductService(req, res);
+  return res.json(result);
+};
+
 module.exports = {
   createProduct,
   getProductsByCategory,
   getAllProducts,
+  searchProductController,
 };

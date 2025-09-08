@@ -15,6 +15,7 @@ const {
   createProduct,
   getProductsByCategory,
   getAllProducts,
+  searchProductController
 } = require("../controllers/productController");
 
 const auth = require("../middlewares/auth.js");
@@ -41,5 +42,7 @@ router.get("/category/all", getAllCategories);
 router.post("/product/add", createProduct);
 router.get("/product/category/:categoryName", getProductsByCategory);
 router.get("/product/all", getAllProducts);
+router.get("/product/search", searchProductController);
+
 
 module.exports = router;
