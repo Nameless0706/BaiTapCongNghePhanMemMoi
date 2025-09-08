@@ -8,6 +8,20 @@ const apiRoutes = require("./routes/api");
 const connection = require("./config/database");
 const { getHomepage } = require("./controllers/homeController");
 const cors = require("cors");
+const {esClient} = require("./config/elastic")
+
+
+
+async function check() {
+  try {
+    const info = await esClient.info();
+    console.log("Connected to Elasticsearch:", info.version.number);
+  } catch (err) {
+    console.error(" Cannot connect to Elasticsearch:", err.message);
+  }
+}
+
+
 
 const app = express(); //cấu hình app là express
 //cấu hình port, nếu tìm thấy port trong env, không thì trả về 8888
@@ -36,3 +50,5 @@ app.use("/v1/api/", apiRoutes);
     console.log(">>> Error connect to DB: ", error);
   }
 })();
+
+check();
