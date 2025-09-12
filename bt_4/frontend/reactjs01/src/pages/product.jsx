@@ -1,90 +1,128 @@
-import React, { useEffect, useState, useRef } from "react";
-import clsx from "clsx";
-import useLazyLoad from "../util/useLazyLoad";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { getAllCategories, getAllProductsByCategoryName } from "../util/api";
+import React, { useEffect, useState } from "react";
+import {
+  getAllCategories,
+  getAllProductsByCategoryName,
+  getAllProducts,
+} from "../util/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/layout/card";
-import { LoadingProducts } from "../components/layout/loadingProduct";
 
 const CategoryProducts = () => {
-  const { categoryName } = useParams(); // read category from URL
+  const { categoryName } = useParams();
   const navigate = useNavigate();
 
-  const triggerRef = useRef(null);
-
   const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]); // your own products state
+  const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch all categories
+  const PAGE_SIZE = 6;
+
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       const res = await getAllCategories();
-      console.log(">>> Res categories: ", res);
-      if (res && res.EC === 0) setCategories(res.DT || []);
+      if (res && res.EC === 0) {
+        setCategories(res.DT || []);
+      }
     } catch (err) {
       console.error("Error loading categories", err);
     }
   };
 
-  // Fetch products by category
-  const fetchProducts = async (pageNumber) => {
+  // Fetch all products (no category filter)
+  const fetchAllProducts = async (pageNum = 1) => {
+    setLoading(true);
     try {
-      const res = await getAllProductsByCategoryName(categoryName, pageNumber);
-      console.log(categoryName, pageNumber, res);
-
+      const res = await getAllProducts(pageNum, PAGE_SIZE);
       if (res.DT.length > 0) {
-        return res.DT; 
-      } else {
-        setHasMore(false);
-        return []; // return empty array so hook doesn’t break
+        setProducts(res.DT);
+        setTotalPages(res.totalPages || 1);
+        setPage(pageNum);
       }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return [];
+    } catch (err) {
+      console.error("Error fetching all products:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ renamed destructuring to avoid shadowing
-  const { data: lazyProducts, loading } = useLazyLoad({
-    triggerRef,
-    onGrabData: fetchProducts,
-  });
-
-  // When category changes, reset state and reload
-  useEffect(() => {
-    setProducts([]);
-    setPage(1);
-    setHasMore(true);
-    if (categoryName) {
-      fetchProducts();
+  // Fetch products by category
+  const fetchProductsByCategory = async (pageNum = 1) => {
+    if (!categoryName) return;
+    setLoading(true);
+    try {
+      const res = await getAllProductsByCategoryName(
+        categoryName,
+        pageNum,
+        PAGE_SIZE
+      );
+      if (res.DT.length > 0) {
+        setProducts(res.DT);
+        setTotalPages(res.totalPages || 1);
+        setPage(pageNum);
+      } else {
+        setProducts([]);
+      }
+    } catch (err) {
+      console.error("Error fetching category products:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [categoryName]);
+  };
 
+  // Effect for categories
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Handle dropdown change
+  // Effect for products
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    if (categoryName) {
+      fetchProductsByCategory(1);
+    } else {
+      fetchAllProducts(1); //   fetch all products on first load
+    }
+  }, [categoryName]);
+
   const handleCategoryChange = (e) => {
     const selected = e.target.value;
     if (selected) {
       navigate(`/product/category/${selected}`);
+    } else {
+      navigate(`/products`); // back to all products
+    }
+  };
+
+  const handlePrev = () => {
+    if (page > 1) {
+      categoryName
+        ? fetchProductsByCategory(page - 1)
+        : fetchAllProducts(page - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) {
+      categoryName
+        ? fetchProductsByCategory(page + 1)
+        : fetchAllProducts(page + 1);
     }
   };
 
   return (
-    <div>
-      {/* Dropdown for category selection */}
+    <div className="p-4">
+      {/* Dropdown */}
       <div className="mb-4">
         <select
           value={categoryName || ""}
           onChange={handleCategoryChange}
           className="border px-3 py-2 rounded"
         >
-          <option value="">-- Select Category --</option>
+          <option value="">-- All Products --</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat.name}>
               {cat.name}
@@ -93,35 +131,41 @@ const CategoryProducts = () => {
         </select>
       </div>
 
-      {/* Grid with lazy loaded products */}
-      <div className="grid grid-cols-3 gap-4 content-start">
-        {lazyProducts.map((prod) => (
-          <Card key={prod._id} owner={prod.price} imageUrl={prod.imageUrl} />
-        ))}
-      </div>
+      {/* Products */}
+      {loading ? (
+        <p className="text-center py-6">Loading...</p>
+      ) : products.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <Card key={product._id} product={product} />
+            ))}
+          </div>
 
-      <div ref={triggerRef} className={clsx("trigger", { visible: loading })}>
-        <LoadingProducts />
-      </div>
-
-      {/* Infinite Scroll for products */}
-      <InfiniteScroll
-        dataLength={products.length}
-        next={fetchProducts}
-        hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
-        endMessage={<p style={{ textAlign: "center" }}>No more products</p>}
-      >
-        <div className="grid grid-cols-2 gap-4">
-          {products.map((p) => (
-            <div key={p._id} className="border p-3 rounded shadow">
-              <h3>{p.name}</h3>
-              <p>Price: {p.price}</p>
-              <p>Category: {p.category?.name}</p>
-            </div>
-          ))}
-        </div>
-      </InfiniteScroll>
+          {/* Pagination */}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+              onClick={handlePrev}
+              disabled={page === 1}
+              className="px-4 py-2 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={page === totalPages}
+              className="px-4 py-2 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500 py-6">No products found.</p>
+      )}
     </div>
   );
 };

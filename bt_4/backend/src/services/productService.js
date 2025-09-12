@@ -23,10 +23,15 @@ const getProductsByCategoryService = async (req, res) => {
     const categoryId = category._id;
     console.log("Found category ID:", categoryId);
 
+    console.log(req.query);
+
     // Pagination
     const { page = 1, limit = 10 } = req.query;
 
     const skip = (page - 1) * limit;
+
+    console.log("page:", page);
+    console.log("Limit: ", limit);
 
     const products = await Product.find({ category: categoryId })
       .populate("category")
@@ -51,7 +56,13 @@ const getProductsByCategoryService = async (req, res) => {
   }
 };
 
-const createProductService = async (name, price, description, view, category) => {
+const createProductService = async (
+  name,
+  price,
+  description,
+  view,
+  category
+) => {
   try {
     const newProduct = await Product.create({
       name,
@@ -69,16 +80,31 @@ const createProductService = async (name, price, description, view, category) =>
   }
 };
 
-
-const getAllProductsService = async () => {
+const getAllProductsService = async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
-    return { EC: 0, EM: "Get all products success", DT: products };
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find()
+      .populate("category")
+      .skip(Number(skip))
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments();
+
+    return {
+      EC: 0,
+      EM: "Get all products success",
+      DT: products,
+      total,
+      currentPage: Number(page),
+      totalPages: Math.ceil(total / Number(limit)),
+    };
   } catch (err) {
     return { EC: 1, EM: err.message, DT: [] };
   }
 };
-
 
 // const searchProductService = async (q) => {
 //   try {
@@ -90,13 +116,17 @@ const getAllProductsService = async () => {
 //   }
 // }
 
-
-
 const searchProductService = async (req, res) => {
   try {
-
-    
-    const { q = "", page = 1, limit = 10, priceMin, priceMax, viewMin, viewMax } = req.query;
+    const {
+      q = "",
+      page = 1,
+      limit = 10,
+      priceMin,
+      priceMax,
+      viewMin,
+      viewMax,
+    } = req.query;
 
     let results = await searchProducts(q); // fuzzy search trên ES
 
@@ -123,10 +153,9 @@ const searchProductService = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createProductService,
   getProductsByCategoryService,
   getAllProductsService,
-  searchProductService
+  searchProductService,
 };

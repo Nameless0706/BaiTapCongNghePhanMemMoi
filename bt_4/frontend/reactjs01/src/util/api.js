@@ -30,15 +30,23 @@ const getAllCategories = () => {
   return axios.get(URL_API);
 };
 
-const getAllProductsByCategoryName = (categoryName, page) => {
-  const URL_API = `http://localhost:8080/v1/api/product/category/${categoryName}?page=${page}&limit=20`;
+const getAllProductsByCategoryName = (categoryName, page, limit) => {
+  const URL_API = `http://localhost:8080/v1/api/product/category/${categoryName}?page=${page}&limit=${limit}`;
   return axios.get(URL_API);
 };
+
+
+const getAllProducts = (page, limit) => {
+  const URL_API = `http://localhost:8080/v1/api/product/all?page=${page}&limit=${limit}`;
+  return axios.get(URL_API);
+};
+
 
 export {
   createUserApi,
   loginApi,
   getUserApi,
   getAllCategories,
+  getAllProducts,
   getAllProductsByCategoryName,
 };
