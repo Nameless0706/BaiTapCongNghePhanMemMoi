@@ -1,0 +1,22 @@
+{
+  "name": "my_first_bt7_cart_lib",
+  "version": "1.0.0",
+  "description": "My first cart library (React components + context for Cart)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx"
+  },
+  "keywords": [
+    "react",
+    "cart",
+    "library",
+    "shopping-cart"
+  ],
+  "author": "",
+  "license": "ISC" 
+  
+}
