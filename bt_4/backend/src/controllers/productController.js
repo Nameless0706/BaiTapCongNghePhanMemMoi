@@ -63,7 +63,7 @@ const getProductsByCategory = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const data = await getAllProductsService();
+    const data = await getAllProductsService(req, res);
     return res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching products:", error);
