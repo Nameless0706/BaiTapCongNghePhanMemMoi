@@ -3,6 +3,7 @@ import {
   getAllCategories,
   getAllProductsByCategoryName,
   getAllProducts,
+  searchProducts,   // ✅ import new api
 } from "../util/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/layout/card";
@@ -13,30 +14,29 @@ const CategoryProducts = () => {
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");   // ✅ state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const PAGE_SIZE = 6;
 
-  // Fetch categories
+  // --- Fetch categories
   const fetchCategories = async () => {
     try {
       const res = await getAllCategories();
-      if (res && res.EC === 0) {
-        setCategories(res.DT || []);
-      }
+      if (res && res.EC === 0) setCategories(res.DT || []);
     } catch (err) {
       console.error("Error loading categories", err);
     }
   };
 
-  // Fetch all products (no category filter)
+  // --- Fetch all products
   const fetchAllProducts = async (pageNum = 1) => {
     setLoading(true);
     try {
       const res = await getAllProducts(pageNum, PAGE_SIZE);
-      if (res.DT.length > 0) {
+      if (res.DT.length >= 0) {
         setProducts(res.DT);
         setTotalPages(res.totalPages || 1);
         setPage(pageNum);
@@ -48,7 +48,7 @@ const CategoryProducts = () => {
     }
   };
 
-  // Fetch products by category
+  // --- Fetch products by category
   const fetchProductsByCategory = async (pageNum = 1) => {
     if (!categoryName) return;
     setLoading(true);
@@ -58,12 +58,10 @@ const CategoryProducts = () => {
         pageNum,
         PAGE_SIZE
       );
-      if (res.DT.length > 0) {
+      if (res.DT.length >= 0) {
         setProducts(res.DT);
         setTotalPages(res.totalPages || 1);
         setPage(pageNum);
-      } else {
-        setProducts([]);
       }
     } catch (err) {
       console.error("Error fetching category products:", err);
@@ -72,34 +70,55 @@ const CategoryProducts = () => {
     }
   };
 
-  // Effect for categories
+  // --- Fetch products by search
+  const fetchSearchProducts = async (pageNum = 1) => {
+    if (!searchTerm) return; // empty -> no search
+    setLoading(true);
+    try {
+      const res = await searchProducts(searchTerm);
+      console.log(res);
+      if (res.DT.length >= 0) {
+        setProducts(res.DT);
+        setTotalPages(res.totalPages || 1);
+        setPage(pageNum);
+      }
+    } catch (err) {
+      console.error("Error searching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Effects
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Effect for products
   useEffect(() => {
     setProducts([]);
     setPage(1);
-    if (categoryName) {
+    if (searchTerm) {
+      fetchSearchProducts(1); // 🔍 search first
+    } else if (categoryName) {
       fetchProductsByCategory(1);
     } else {
-      fetchAllProducts(1); //   fetch all products on first load
+      fetchAllProducts(1);
     }
-  }, [categoryName]);
+  }, [categoryName, searchTerm]);
 
+  // --- Handlers
   const handleCategoryChange = (e) => {
+    setSearchTerm(""); // reset search if change category
     const selected = e.target.value;
-    if (selected) {
-      navigate(`/product/category/${selected}`);
-    } else {
-      navigate(`/products`); // back to all products
-    }
+    if (selected) navigate(`/product/category/${selected}`);
+    else navigate(`/products`);
   };
 
   const handlePrev = () => {
     if (page > 1) {
-      categoryName
+      searchTerm
+        ? fetchSearchProducts(page - 1)
+        : categoryName
         ? fetchProductsByCategory(page - 1)
         : fetchAllProducts(page - 1);
     }
@@ -107,7 +126,9 @@ const CategoryProducts = () => {
 
   const handleNext = () => {
     if (page < totalPages) {
-      categoryName
+      searchTerm
+        ? fetchSearchProducts(page + 1)
+        : categoryName
         ? fetchProductsByCategory(page + 1)
         : fetchAllProducts(page + 1);
     }
@@ -115,8 +136,8 @@ const CategoryProducts = () => {
 
   return (
     <div className="p-4">
-      {/* Dropdown */}
-      <div className="mb-4">
+      {/* Controls */}
+      <div className="mb-4 flex gap-4">
         <select
           value={categoryName || ""}
           onChange={handleCategoryChange}
@@ -129,6 +150,15 @@ const CategoryProducts = () => {
             </option>
           ))}
         </select>
+
+        {/* Search bar */}
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border px-3 py-2 rounded flex-1"
+        />
       </div>
 
       {/* Products */}

@@ -35,12 +35,18 @@ const getAllProductsByCategoryName = (categoryName, page, limit) => {
   return axios.get(URL_API);
 };
 
-
 const getAllProducts = (page, limit) => {
   const URL_API = `http://localhost:8080/v1/api/product/all?page=${page}&limit=${limit}`;
   return axios.get(URL_API);
 };
 
+const searchProducts = async (query) => {
+  const URL_API = `http://localhost:8080/v1/api/product/search`;
+
+  return axios.get(URL_API, {
+    params: { q: query },
+  });
+};
 
 export {
   createUserApi,
@@ -49,4 +55,5 @@ export {
   getAllCategories,
   getAllProducts,
   getAllProductsByCategoryName,
+  searchProducts,
 };

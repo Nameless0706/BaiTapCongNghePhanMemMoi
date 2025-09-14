@@ -3,7 +3,7 @@ export const Card = ({ product }) => {
     <div className="w-full rounded overflow-hidden shadow-lg m-2">
       <img
         className="w-full h-64 object-cover"
-        src="https://via.placeholder.com/300x200?text=No+Image"
+        src="https://m.media-amazon.com/images/I/61Qe0euJJZL.jpg"
         alt={product.name}
       />
       <div className="px-6 py-4">
