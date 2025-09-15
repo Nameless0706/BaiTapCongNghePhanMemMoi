@@ -3,7 +3,7 @@ import {
   getAllCategories,
   getAllProductsByCategoryName,
   getAllProducts,
-  searchProducts,   // ✅ import new api
+  searchProducts,
 } from "../util/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/layout/card";
@@ -14,7 +14,7 @@ const CategoryProducts = () => {
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");   // ✅ state
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -98,7 +98,7 @@ const CategoryProducts = () => {
     setProducts([]);
     setPage(1);
     if (searchTerm) {
-      fetchSearchProducts(1); // 🔍 search first
+      fetchSearchProducts(1);
     } else if (categoryName) {
       fetchProductsByCategory(1);
     } else {
