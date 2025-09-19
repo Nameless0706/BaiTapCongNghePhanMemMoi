@@ -48,6 +48,11 @@ const searchProducts = async (query) => {
   });
 };
 
+export const getProductById = async (id) => {
+  const URL_API = `http://localhost:8080/v1/api/product/${id}`;
+  return axios.get(URL_API)
+};
+
 export {
   createUserApi,
   loginApi,

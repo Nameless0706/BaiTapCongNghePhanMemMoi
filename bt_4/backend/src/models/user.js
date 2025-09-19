@@ -4,8 +4,9 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
-  role: String
-})
+  role: String,
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "product" }],
+});
 
 const User = mongoose.model("user", userSchema);
 

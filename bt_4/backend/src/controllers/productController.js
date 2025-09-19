@@ -2,7 +2,9 @@ const {
   createProductService,
   getProductsByCategoryService,
   getAllProductsService,
+  getProductByIdService,
   searchProductService,
+  getRelatedProductsService,
 } = require("../services/productService");
 
 const Category = require("../models/category");
@@ -75,6 +77,35 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getProductById = async (req, res) => {
+  try {
+    const data = await getProductByIdService(req, res);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return res.status(500).json({
+      EC: -1,
+      EM: "Internal server error",
+      DT: null,
+    });
+  }
+};
+
+const getRelatedProducts = async (req, res) => {
+  try {
+    const data = await getRelatedProductsService(req, res);
+    console.log(data);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    return res.status(500).json({
+      EC: -1,
+      EM: "Internal server error",
+      DT: null,
+    });
+  }
+};
+
 // Search products
 const searchProductController = async (req, res) => {
   const result = await searchProductService(req, res);
@@ -85,5 +116,7 @@ module.exports = {
   createProduct,
   getProductsByCategory,
   getAllProducts,
+  getProductById,
   searchProductController,
+  getRelatedProducts,
 };

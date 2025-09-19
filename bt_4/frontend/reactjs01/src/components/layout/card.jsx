@@ -1,6 +1,9 @@
-export const Card = ({ product }) => {
+export const Card = ({ product, onClick }) => {
   return (
-    <div className="w-full rounded overflow-hidden shadow-lg m-2">
+    <div
+      className="w-full rounded overflow-hidden shadow-lg m-2"
+      onClick={onClick}
+    >
       <img
         className="w-full h-64 object-cover"
         src="https://m.media-amazon.com/images/I/61Qe0euJJZL.jpg"
