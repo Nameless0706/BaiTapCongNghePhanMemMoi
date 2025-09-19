@@ -10,6 +10,7 @@ import HomePage from "./pages/home.jsx";
 import LoginPage from "./pages/login.jsx";
 import CategoryProductsPage from "./pages/product.jsx";
 import { AuthWrapper } from "./components/context/auth.context";
+import ProductDetail from "./pages/productDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,11 @@ const router = createBrowserRouter([
       {
         path: "product/category/:categoryName",
         element: <CategoryProductsPage />,
+      },
+
+      {
+        path: "product/:id",
+        element: <ProductDetail />
       },
 
       {

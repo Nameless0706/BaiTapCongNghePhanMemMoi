@@ -7,6 +7,8 @@ import {
 } from "../util/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/layout/card";
+import { Spin } from "antd";
+
 
 const CategoryProducts = () => {
   const { categoryName } = useParams();
@@ -36,6 +38,10 @@ const CategoryProducts = () => {
     setLoading(true);
     try {
       const res = await getAllProducts(pageNum, PAGE_SIZE);
+      console.log("<<<all products>>>");
+
+      console.log(res);
+
       if (res.DT.length >= 0) {
         setProducts(res.DT);
         setTotalPages(res.totalPages || 1);
@@ -51,6 +57,7 @@ const CategoryProducts = () => {
   // --- Fetch products by category
   const fetchProductsByCategory = async (pageNum = 1) => {
     if (!categoryName) return;
+
     setLoading(true);
     try {
       const res = await getAllProductsByCategoryName(
@@ -58,6 +65,9 @@ const CategoryProducts = () => {
         pageNum,
         PAGE_SIZE
       );
+      console.log("<<<category>>>");
+      console.log(res);
+
       if (res.DT.length >= 0) {
         setProducts(res.DT);
         setTotalPages(res.totalPages || 1);
@@ -163,12 +173,25 @@ const CategoryProducts = () => {
 
       {/* Products */}
       {loading ? (
-        <p className="text-center py-6">Loading...</p>
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <Spin />
+        </div>
       ) : products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {products.map((product) => (
-              <Card key={product._id} product={product} />
+              <Card
+                key={product._id}
+                product={product}
+                onClick={() => navigate(`/product/${product._id}`)}
+              />
             ))}
           </div>
 

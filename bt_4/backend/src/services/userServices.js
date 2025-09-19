@@ -33,6 +33,8 @@ const loginService = async (email, password) => {
   try {
     const user = await User.findOne({ email });
 
+    console.log(user._id.toString());
+
     if (user) {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
@@ -41,7 +43,11 @@ const loginService = async (email, password) => {
           EM: "Wrong email or password",
         };
       } else {
+        console.log("Heyyqydasd");
+        console.log(user._id);
         const payload = {
+          _id: user._id.toString(),
+          test: "hello",
           email: user.email,
           name: user.name,
         };
@@ -54,6 +60,7 @@ const loginService = async (email, password) => {
           accessToken: accessToken,
           EM: "Login success",
           user: {
+            _id: user._id.toString(),
             email: user.email,
             name: user.name,
             role: user.role,

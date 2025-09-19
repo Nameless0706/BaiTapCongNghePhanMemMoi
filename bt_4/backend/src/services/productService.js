@@ -106,6 +106,44 @@ const getAllProductsService = async (req, res) => {
   }
 };
 
+const getProductByIdService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log(id);
+
+    const product = await Product.findById(id);
+
+    console.log(product);
+
+    return {
+      EC: 0,
+      EM: "Get product success",
+      DT: product,
+    };
+  } catch (err) {
+    return { EC: 1, EM: err.message, DT: [] };
+  }
+};
+
+const getRelatedProductsService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id).populate("category");
+    if (!product) return { EC: 1, EM: "Product not found" };
+
+    const related = await Product.find({
+      category: product.category._id,
+      _id: { $ne: product._id }, // loại trừ chính nó
+    }).limit(5);
+
+    return { EC: 0, EM: "Get related products success", DT: related };
+  } catch (err) {
+    return { EC: 1, EM: err.message };
+  }
+};
+
 // const searchProductService = async (q) => {
 //   try {
 //     console.log(q);
@@ -157,5 +195,7 @@ module.exports = {
   createProductService,
   getProductsByCategoryService,
   getAllProductsService,
+  getProductByIdService,
   searchProductService,
+  getRelatedProductsService,
 };
