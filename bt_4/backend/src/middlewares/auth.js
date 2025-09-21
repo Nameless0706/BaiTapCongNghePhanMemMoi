@@ -1,7 +1,9 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const User = require("../models/User");
 
-const auth = (req, res, next) => {
+
+const auth = async (req, res, next) => {
     const white_lists =  ['/', '/login', '/register'];
 
     if(white_lists.find(item => '/v1/api' + item === req.originalUrl)){
@@ -23,13 +25,14 @@ const auth = (req, res, next) => {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
                 console.log("<<<< Decoded:");
                 console.log(decoded);
-                req.user = {
-                    _id: decoded._id,
-                    test: decoded.test,
-                    email: decoded.email,
-                    name: decoded.name,
-                    createdBy: "thangHuynh"
+
+                const user = await User.findById(decoded._id).select("-password");
+                if (!user) {
+                    return res.status(401).json({ EC: 1, EM: "User not found" });
                 }
+
+
+                req.user = user;
 
                 //console.log('>>> decoded: ', decoded);
                 next();

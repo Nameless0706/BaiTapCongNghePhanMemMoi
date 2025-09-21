@@ -4,6 +4,7 @@ const {
   handleLogin,
   getUser,
   getAccount,
+  getFavorites
 } = require("../controllers/userController");
 
 const {
@@ -40,6 +41,8 @@ router.post("/login", handleLogin);
 // User
 router.get("/user", getUser);
 router.get("/account", delay, getAccount);
+router.get("/favorite", getFavorites);
+
 
 // Category
 router.post("/category/add", createCategory);

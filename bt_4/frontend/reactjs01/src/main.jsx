@@ -11,6 +11,7 @@ import LoginPage from "./pages/login.jsx";
 import CategoryProductsPage from "./pages/product.jsx";
 import { AuthWrapper } from "./components/context/auth.context";
 import ProductDetail from "./pages/productDetail.jsx";
+import Favorites from "./pages/favorite.jsx";
 
 const router = createBrowserRouter([
   {
@@ -38,7 +39,12 @@ const router = createBrowserRouter([
 
       {
         path: "product/:id",
-        element: <ProductDetail />
+        element: <ProductDetail />,
+      },
+
+      {
+        path: "favorite",
+        element: <Favorites />,
       },
 
       {

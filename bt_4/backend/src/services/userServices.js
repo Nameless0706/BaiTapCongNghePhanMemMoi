@@ -43,13 +43,12 @@ const loginService = async (email, password) => {
           EM: "Wrong email or password",
         };
       } else {
-        console.log("Heyyqydasd");
-        console.log(user._id);
+        
         const payload = {
           _id: user._id.toString(),
-          test: "hello",
-          email: user.email,
-          name: user.name,
+          // test: "hello",
+          // email: user.email,
+          // name: user.name,
         };
 
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -89,8 +88,22 @@ const getUserService = async () => {
   }
 };
 
+const getFavoriteService = async (userId) => {
+  try {
+    const user = await User.findById(userId).populate("favorites");
+    console.log(userId);
+
+    if (!user) return { EC: 1, EM: "User not found" };
+
+    return { EC: 0, DT: user.favorites };
+  } catch (err) {
+    return { EC: 1, EM: err.message };
+  }
+};
+
 module.exports = {
   createUserService,
   loginService,
   getUserService,
+  getFavoriteService,
 };

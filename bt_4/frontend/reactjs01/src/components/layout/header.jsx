@@ -29,12 +29,11 @@ const Header = () => {
           },
 
           {
-            label: <Link to={"/products"}>Products</Link>, 
+            label: <Link to={"/products"}>Products</Link>,
             key: "products",
             icon: <ShoppingOutlined />,
           },
         ]
-        
       : []),
 
     {
@@ -44,6 +43,11 @@ const Header = () => {
       children: [
         ...(auth.isAuthenticated
           ? [
+              {
+                label: <Link to={"/favorite"}>Favorite</Link>,
+                key: "favorite",
+              },
+              
               {
                 label: (
                   <span

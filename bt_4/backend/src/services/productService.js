@@ -110,16 +110,20 @@ const getProductByIdService = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log(id);
-
     const product = await Product.findById(id);
 
-    console.log(product);
+    let isFavorite = false;
 
+    console.log(req.user);
+    if (req.user) {
+      isFavorite = req.user.favorites.some(
+        (fav) => fav.toString() === product._id.toString()
+      );
+    }
     return {
       EC: 0,
       EM: "Get product success",
-      DT: product,
+      DT: { ...product.toObject(), isFavorite },
     };
   } catch (err) {
     return { EC: 1, EM: err.message, DT: [] };

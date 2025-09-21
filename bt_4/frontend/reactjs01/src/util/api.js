@@ -48,17 +48,36 @@ const searchProducts = async (query) => {
   });
 };
 
-export const getProductById = async (id) => {
+const getProductById = async (id) => {
   const URL_API = `http://localhost:8080/v1/api/product/${id}`;
-  return axios.get(URL_API)
+  return axios.get(URL_API);
+};
+
+const getRelatedProducts = async (id) => {
+  const URL_API = `http://localhost:8080/v1/api/product/${id}/related`;
+  return axios.get(URL_API);
+};
+
+const getFavorites = async () => {
+  const URL_API = `http://localhost:8080/v1/api/favorite`;
+  return axios.get(URL_API);
+};
+
+const toggleFavorites = async (prodId) => {
+  const URL_API = `http://localhost:8080/v1/api/product/${prodId}/favorite`;
+  return axios.post(URL_API);
 };
 
 export {
   createUserApi,
   loginApi,
   getUserApi,
+  getFavorites,
+  toggleFavorites,
   getAllCategories,
   getAllProducts,
   getAllProductsByCategoryName,
+  getProductById,
+  getRelatedProducts,
   searchProducts,
 };

@@ -1,31 +1,43 @@
-const {createUserService, loginService, getUserService} = require('../services/userServices');
+const {
+  createUserService,
+  loginService,
+  getUserService,
+  getFavoriteService,
+} = require("../services/userServices");
 
 const createUser = async (req, res) => {
-    const {name, email, password} = req.body;
-    const data = await createUserService(name, email, password);
-    return res.status(200).json(data);
-}
+  const { name, email, password } = req.body;
+  const data = await createUserService(name, email, password);
+  return res.status(200).json(data);
+};
 
 const handleLogin = async (req, res) => {
-    const {email, password} = req.body;
-    const data = await loginService(email, password);
-    return res.status(200).json(data);
-}
+  const { email, password } = req.body;
+  const data = await loginService(email, password);
+  return res.status(200).json(data);
+};
 
 const getUser = async (req, res) => {
-    const data = await getUserService();
-    return res.status(200).json(data);
-}
+  const data = await getUserService();
+  return res.status(200).json(data);
+};
 
 const getAccount = async (req, res) => {
-    return res.status(200).json({
-        message: 'Your account is active'
-    });
-}
+  return res.status(200).json({
+    message: "Your account is active",
+  });
+};
+
+const getFavorites = async (req, res) => {
+  const userId = req.user._id;
+  const data = await getFavoriteService(userId);
+  return res.status(200).json(data);
+};
 
 module.exports = {
-    createUser,
-    handleLogin,
-    getUser,
-    getAccount
-}
+  createUser,
+  handleLogin,
+  getUser,
+  getAccount,
+  getFavorites,
+};
